@@ -16,7 +16,11 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      // libs
+      "lib/*": ["./app/lib/*"],
+      // modules
+      "modules/*": ["./app/modules/*"]
     },
     "skipLibCheck": true,
 
