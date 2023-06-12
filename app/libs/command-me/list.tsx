@@ -1,33 +1,129 @@
-import React from "react";
+import { Combobox } from "@headlessui/react";
+import { classNames } from "./utils";
+// import { create } from "zustand";
+// import { devtools, persist } from "zustand/middleware";
 
-export interface NotesProps {
-  children: React.ReactNode;
-}
+// type ListState = {
+//   commands: Command[];
+//   setCommands: (commands: Command[]) => void;
+// };
 
-export interface NoteItemProps {
-  children: React.ReactNode;
-}
+// const useList = create<ListState>()(
+//   devtools(
+//     persist(
+//       (set) => ({
+//         // CONFIG
+//         commands: [],
+//         setCommands: (commands) =>
+//           set((state) => ({ commands: commands }), false, {
+//             type: "set-commands",
+//             commands: commands,
+//           }),
+//       }),
+//       {
+//         name: "command-me-list",
+//       }
+//     )
+//   )
+// );
 
-type ListContextType = {
-  stuff: any;
+export const List = ({ children }: { children: React.ReactNode }) => {
+  return <ul className="mt-2 text-sm text-gray-700">{children}</ul>;
 };
 
-const ListContext = React.createContext<ListContextType>({} as ListContextType);
-
-export function List({ children }: NotesProps) {
+List.Item = ({
+  title,
+  description,
+  shortcut,
+  prefixIcon,
+  suffix,
+  actions,
+  id,
+}: {
+  title: string;
+  description: string;
+  shortcut?: string[];
+  prefixIcon?: React.ReactNode;
+  suffix?: React.ReactNode;
+  actions?: React.ReactNode;
+  id?: string;
+}) => {
   return (
-    <ListContext.Provider value={{ stuff: "hello" }}>
-      <ul className="flex h-full list-none flex-col overflow-y-auto">
-        {children}
-      </ul>
-    </ListContext.Provider>
+    <Combobox.Option
+      key={title}
+      value={id}
+      className={({ active }) =>
+        classNames(
+          "flex cursor-default select-none items-center px-4 py-2",
+          active && "rounded-md bg-gray-300 bg-opacity-40 text-white"
+        )
+      }
+    >
+      {prefixIcon}
+
+      <div className="w-full">
+        <div className="flex h-full flex-1 flex-row items-center justify-between">
+          <div className="flex flex-row justify-start ">
+            <span className="ml-3 flex-auto truncate text-xs text-black">
+              {title}
+            </span>
+
+            <span className="ml-3 hidden flex-auto truncate text-xs text-gray-500 sm:block">
+              {description}
+            </span>
+
+            <div className="ml-3 flex flex-auto flex-row truncate text-xs text-gray-500">
+              {shortcut?.map((shortcut, index) => (
+                <kbd
+                  key={index}
+                  className="flex h-5 w-5 items-center justify-center rounded border bg-white font-semibold"
+                >
+                  {shortcut}
+                </kbd>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <span className="text-xs text-gray-500">{suffix}</span>
+    </Combobox.Option>
   );
-}
+};
 
-List.Item = function ListItem({ children }: NoteItemProps) {
-  // const { stuff } = React.useContext(ListContext);
+const ActionPanel = ({ children }: { children: React.ReactNode }) => {
+  return <div>{children}</div>;
+};
 
-  return <li>{children}</li>;
+ActionPanel.Push = ({
+  title,
+  target,
+}: {
+  title: string;
+  target: React.ReactNode;
+}) => {
+  return (
+    <button onClick={() => console.log("Push action triggered", title, target)}>
+      {title}
+    </button>
+  );
+};
+
+List.Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => {
+  return (
+    <ul className="py-2">
+      <h3 className="mb-2 font-semibold text-gray-600">{title}</h3>
+      {children}
+    </ul>
+  );
 };
 
 export default List;
+
+// we can create sub views by adding ;subview= to the end of the url

@@ -1,44 +1,42 @@
 import List from "~/libs/command-me/list";
-import type newConfig from ".";
-import { type Action } from "~/libs/command-me";
-import { ActionT, actions, createNoteAction } from ".";
+import { useAction } from "~/libs/command-me/remix/hooks";
+import { type createNote } from ".";
+import React from "react";
+import { EyeIcon } from "@heroicons/react/24/solid";
 
 export interface NotesListProps {
   notes?: { title: string }[];
 }
 
-const useAction = <T extends ActionT>() => {
-  const dispatchAction = ({ type }: { type: T["type"] }) => {
-    return {};
-  };
-
-  return {
-    dispatchAction,
-  };
-};
-
-type x = Parameters<(typeof createNoteAction)["handler"]>;
-
 export const NotesList = (props: NotesListProps | undefined) => {
-  // const { dispatchAction } = useAction<ActionT>();
+  const { dispatchAction, state, data } = useAction<typeof createNote>();
+
+  React.useEffect(() => {
+    console.log("state: ", state);
+  }, [state]);
+
+  React.useEffect(() => {
+    console.log("HELLO: ", data?.hello);
+  }, [data]);
 
   return (
     <List>
       {props?.notes?.map((item) => {
         return (
           <List.Item
+            title={item.title}
+            description="Show selection of notes in a list view"
+            prefixIcon={<EyeIcon className="h-6 w-6" />}
             // onClick={() => {
             //   dispatchAction({
-            //     type: "creteNote",
+            //     type: "createNote",
             //     payload: {
-            //       title: "new note",
+            //       test: item.title,
             //     },
             //   });
             // }}
             key={item.title}
-          >
-            {item.title}
-          </List.Item>
+          />
         );
       })}
     </List>

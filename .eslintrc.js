@@ -18,4 +18,8 @@ module.exports = {
       version: 28,
     },
   },
+  rules: {
+    // react display name is not needed for remix
+    "react/display-name": "off",
+  },
 };

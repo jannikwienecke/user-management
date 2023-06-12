@@ -1,20 +1,6 @@
 import type { ActionArgs, LoaderArgs } from "@remix-run/server-runtime";
 
 export type App = "User" | "System";
-// export type CommandType = "command" | "link" | "action";
-// export type Command<T extends string = string> = {
-//   label: string;
-//   description: string;
-//   app: App;
-//   icon: JSX.Element;
-//   type: CommandType;
-//   shortcut?: string[];
-//   view?: T;
-// };
-
-// export type Views<T extends string> = {
-//   [id in T]: View;
-// };
 
 export type Command<T = {}> = {
   name: string;
@@ -26,35 +12,25 @@ export type Command<T = {}> = {
   mode: {
     type: "view" | "no-view";
     id: string;
-    loader: (props: LoaderArgs) => Promise<T>;
-    view: (props: T | undefined) => JSX.Element;
+    loader?: (props: LoaderArgs) => Promise<T>;
+    view?: (props: T | undefined) => JSX.Element;
   };
 };
 
-export interface Action<PropsType = {}> {
-  type: string;
-  handler: (props: ActionArgs & { props: PropsType }) => Promise<unknown>;
-}
-
-export type ModuleConfig<T, ActionType extends Action[]> = {
+export type ModuleConfig<T> = {
   name: string;
   title: string;
   description: string;
   author: string;
   categories: string[];
   license: string;
-  serverActions: ActionType;
   commands: Command<T>[];
+  actions: Action<any>[];
 };
 
 export type GlobalConfig = {
-  modules: ModuleConfig<any, []>[];
+  modules: ModuleConfig<any>[];
 };
-
-// export type View = {
-//   component: React.FC;
-//   commands: Command[];
-// };
 
 export type InternalContextType = {
   globalConfig: GlobalConfig;
@@ -65,3 +41,17 @@ export type InternalContextType = {
   handleClickCommand: (command: Command) => void;
   commands: Command[];
 };
+
+export interface Action<T> {
+  type: string;
+  handler: (props: ActionArgs & T) => Promise<unknown>;
+}
+
+export type ArgumentsOfAction<T extends Action<any>> = Omit<
+  Parameters<T["handler"]>[0],
+  "request" | "params" | "context"
+>;
+
+export type ReturnTypeOfAction<T extends Action<any>> = ReturnType<
+  T["handler"]
+>;

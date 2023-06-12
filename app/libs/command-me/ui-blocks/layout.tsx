@@ -1,21 +1,27 @@
 import { Header } from "./header";
 import { SearchInput } from "./search-input";
-import { useInternalContext } from "../state-management/use-internal-state";
 import { CommandOverviewList } from "./command-overview-list";
 import { ContentContainer } from "./content-container";
+import { useGlobalStore } from "../command-palette";
+import { filteredCommands } from "../utils/state-getters";
+import { Footer } from "./footer";
 
 export const Layout = () => {
-  const { enterRawQuery, command, pageData, handleClickCommand, commands } =
-    useInternalContext();
+  const activeCommand = useGlobalStore((state) => state.activeCommand);
+  const loaderData = useGlobalStore((state) => state.loaderData);
+  const commands = useGlobalStore(filteredCommands);
 
-  const ComponentToRender = command?.mode.view ? (
-    <command.mode.view key={command.mode.id} {...(pageData || {})} />
+  const ComponentToRender = activeCommand?.mode.view ? (
+    <activeCommand.mode.view
+      key={activeCommand.mode.id}
+      {...(loaderData || {})}
+    />
   ) : (
     <CommandOverviewList commands={commands} />
   );
 
-  const canGoBack = Boolean(command?.mode.id);
-  const { hideSearch } = command || {};
+  const { hideSearch } = activeCommand || {};
+
   return (
     <>
       {hideSearch ? (
@@ -24,15 +30,15 @@ export const Layout = () => {
             <Header.BackButton />
           </Header.Container>
           <ContentContainer>{ComponentToRender}</ContentContainer>
+          <Footer />
         </>
       ) : (
-        <SearchInput
-          canGoBack={canGoBack}
-          onChange={enterRawQuery}
-          onSelect={handleClickCommand}
-        >
-          <ContentContainer>{ComponentToRender}</ContentContainer>
-        </SearchInput>
+        <>
+          <SearchInput>
+            <ContentContainer>{ComponentToRender}</ContentContainer>
+          </SearchInput>
+          <Footer />
+        </>
       )}
     </>
   );
